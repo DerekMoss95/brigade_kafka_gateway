@@ -1,0 +1,47 @@
+--- {{ $fname := include "kafka-brigade-gateway.fullname" . }}
+{{ $serviceAccount := default $fname .Values.serviceAccount.name }}
+{{ if .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $serviceAccount }}
+  labels:
+    app: {{ template "kafka-brigade-gateway.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+{{ end }}
+{{ if .Values.rbac.enabled }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: {{ $fname }}
+  labels:
+    app: {{ template "kafka-brigade-gateway.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["list", "watch", "get", "create"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1 
+metadata:
+  name: {{ $fname }}
+  labels:
+    app: {{ template "kafka-brigade-gateway.fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+subjects:
+- kind: ServiceAccount
+  name: {{ $fname }}
+roleRef:
+  kind: Role
+  name: {{ $fname }}
+  apiGroup: rbac.authorization.k8s.io
+{{ end }}

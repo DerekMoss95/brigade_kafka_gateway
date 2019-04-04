@@ -1,48 +1,26 @@
-# Default values for kafka-brigade-gateway.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# This is the main configuration file for the Brigade Kafka chart.
+# To override values here, specify them in your own YAML file, and override
+# during install or upgrade:
+#
+#    $ helm install -n brigade-kafka-gateway -f myValues.yaml ./chart
+#
+# By default, the chart will install without RBAC. To install with
+# RBAC, set `rbac.enabled` to `true`.
 
-replicaCount: 1
+# kafka is the kafka gateway.
 
-image:
-  repository: nginx
-  tag: stable
-  pullPolicy: IfNotPresent
+rbac:
+  enabled: true
+serviceAccount:
+  create: true
 
-nameOverride: ""
-fullnameOverride: ""
+registry: derekm95
+name: brigade-kafka-gateway
+tag: 'v0.0.1-alpha.4'
+pullPolicy: IfNotPresent
 
-service:
-  type: ClusterIP
-  port: 80
-
-ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  paths: []
-  hosts:
-    - chart-example.local
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-  # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
+kafka_host: ''
+kafka_port: '9092'
+kafka_topic: ''
+kafka_offset: 'latest'
+brigade_project_name: ''
